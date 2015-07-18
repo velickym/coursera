@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>2D Sierpinski Gasket</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+
+	<style>
+
+		#inputs {
+			width: 512px;
+		}
+
+		th {
+			text-align: left;
+		}
+
+		label {
+			min-width: 25px;
+			display: inline-block;
+		}
+
+		canvas {
+			margin-top: 2em;
+		}
+
+	</style>
+
+	<script id="vertex-shader" type="x-shader/x-vertex">
+	attribute vec4 vPosition;
+
+	void
+	main()
+	{
+	    gl_Position = vPosition;
+	}
+	</script>
+
+	<script id="fragment-shader" type="x-shader/x-fragment">
+		precision mediump float;
+
+		void
+		main()
+		{
+		    gl_FragColor = vec4( 0.4, 1.0, 0.2, 1.0 );
+
+		}
+	</script>
+
+	<script type="text/javascript" src="common/webgl-utils.js"></script>
+	<script type="text/javascript" src="common/initShaders.js"></script>
+	<script type="text/javascript" src="common/MV.js"></script>
+	<script type="text/javascript" src="program.js"></script>
+</head>   
+
+<body>
+
+	<table id="inputs">
+
+		<tr>
+			<th>Shape</th>
+			<td>
+				<input class="radio" type="radio" name="shape" value="triangle" />&nbsp;Triangle
+				&nbsp;&nbsp;
+				<input class="radio" type="radio" name="shape" value="square" checked="checked" />&nbsp;Square
+			</td>
+		</tr>
+		<tr>
+			<th>Tessalation amount</th>
+			<td>
+				<input id="tessalation" type="range" min="0" max="7" step="1" value="1" />
+				<label id="tessalation-label">0</label>
+			</td>
+		</tr>
+		<tr>
+			<th>Twist</th>
+			<td>
+				<input id="twist" type="range" min="0" max="360" step="5" value="0" />
+				<label id="twist-label">0</label> degrees
+			</td>
+		</tr>
+		
+		<tr>
+			<th></th>
+			<td>
+				<input id="gasket" type="checkbox" /> Gasket
+			</td>
+		</tr>
+
+	</table>
+
+	<canvas id="gl-canvas" width="512" height="512">
+		Oops ... your browser doesn't support the HTML5 canvas element
+	</canvas>
+</body>
+</html>
