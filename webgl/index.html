@@ -60,30 +60,33 @@
 		<tr>
 			<th>Shape</th>
 			<td>
-				<input class="radio" type="radio" name="shape" value="triangle" />&nbsp;Triangle
+				<input class="shape" type="radio" name="shape" value="triangle" />&nbsp;Triangle
 				&nbsp;&nbsp;
-				<input class="radio" type="radio" name="shape" value="square" checked="checked" />&nbsp;Square
+				<input class="shape" type="radio" name="shape" value="square" checked="checked" />&nbsp;Square
+			</td>
+		</tr>
+		<tr>
+			<th>Fill</th>
+			<td>
+				<input class="fill" type="radio" name="fill" value="solid" />&nbsp;Solid
+				&nbsp;&nbsp;
+				<input class="fill" type="radio" name="fill" value="gasket" checked="checked" />&nbsp;Gasket
+				&nbsp;&nbsp;
+				<input class="fill" type="radio" name="fill" value="mesh" />&nbsp;Mesh
 			</td>
 		</tr>
 		<tr>
 			<th>Tessalation amount</th>
 			<td>
-				<input id="tessalation" type="range" min="0" max="7" step="1" value="1" />
-				<label id="tessalation-label">0</label>
+				<input id="tessalation" type="range" min="0" max="7" step="1" value="3" />
+				<label id="tessalation-label">3</label>
 			</td>
 		</tr>
 		<tr>
 			<th>Twist</th>
 			<td>
-				<input id="twist" type="range" min="0" max="360" step="5" value="0" />
-				<label id="twist-label">0</label> degrees
-			</td>
-		</tr>
-		
-		<tr>
-			<th></th>
-			<td>
-				<input id="gasket" type="checkbox" /> Gasket
+				<input id="twist" type="range" min="0" max="360" step="5" value="60" />
+				<label id="twist-label">60</label> degrees
 			</td>
 		</tr>
 

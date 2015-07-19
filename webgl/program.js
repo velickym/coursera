@@ -6,113 +6,134 @@ function ang2rad(angle) {
 
 window.onload = function init() {
 
+    var rangeTessalation = document.getElementById("tessalation"),
+        labelTessalation = document.getElementById("tessalation-label"),
+        rangeTwist = document.getElementById("twist"),
+        labelTwist = document.getElementById("twist-label"),
+        radiosShape = document.getElementsByClassName("shape"),
+        radiosFill = document.getElementsByClassName("fill");
+
     var canvas = document.getElementById("gl-canvas");
-    var gl = WebGLUtils.setupWebGL( canvas );
+    var gl = WebGLUtils.setupWebGL(canvas, undefined);
 
     if (!gl) { 
         alert( "WebGL isn't available" ); 
         return;
     }
 
-    var points = [],
-        rangeTessalation = document.getElementById("tessalation"),
-        labelTessalation = document.getElementById("tessalation-label"),
-        rangeTwist = document.getElementById("twist"),
-        labelTwist = document.getElementById("twist-label"),
-        checkboxGasket = document.getElementById("gasket"),
-        radiosShape = document.getElementsByClassName("radio");
+    var points = [];
+    var shapeSetup = {
 
-    function divideTriangle( a, b, c, count, gasket) {
-        // check for end of recursion
+        square: {
 
-        if ( count === 0 ) {
-            points.push( a, b, c );
-        } else {
+            divide: function (vertices, count, gasket) {
 
-            //bisect the sides
+                var a = vertices[0];
+                var b = vertices[1];
+                var c = vertices[2];
+                var d = vertices[3];
 
-            var ab = mix( a, b, 0.5 );
-            var ac = mix( a, c, 0.5 );
-            var bc = mix( b, c, 0.5 );
+                if (count === 0) {
+                    points.push(a, b, c);
+                    points.push(a, c, d);
+                } else {
 
-            --count;
+                    var a1 = mix(c, a, 1 / 3);
+                    var b1 = mix(d, b, 1 / 3);
+                    var c1 = mix(a, c, 1 / 3);
+                    var d1 = mix(b, d, 1 / 3);
 
-            // three new triangles
+                    --count;
 
-            divideTriangle(a, ab, ac, count, gasket);
-            divideTriangle(c, ac, bc, count, gasket);
-            divideTriangle(b, bc, ab, count, gasket);
+                    this.divide([a, mix(b, a, 1 / 3), a1, mix(d, a, 1 / 3)], count, gasket);
+                    this.divide([mix(b, a, 1 / 3), mix(b, a, 2 / 3), b1, a1], count, gasket);
+                    this.divide([mix(b, a, 2 / 3), b, mix(c, b, 1 / 3), b1], count, gasket);
+                    this.divide([mix(c, b, 1 / 3), mix(c, b, 2 / 3), c1, b1], count, gasket);
+                    this.divide([c1, mix(c, b, 2 / 3), c, mix(d, c, 1 / 3)], count, gasket);
+                    this.divide([d1, c1, mix(d, c, 1 / 3), mix(d, c, 2 / 3)], count, gasket);
+                    this.divide([mix(d, a, 2 / 3), d1, mix(d, c, 2 / 3), d], count, gasket);
+                    this.divide([mix(d, a, 1 / 3), a1, d1, mix(d, a, 2 / 3)], count, gasket);
 
-            if (gasket) {
-                divideTriangle(ac, ab, bc, count, gasket);
-            }
-        }
-    }
+                    if (!gasket) {
+                        this.divide([a1, b1, c1, d1], count, gasket);
+                    }
+                }
+            },
 
-    function divideSquare(a, b, c, d, count, gasket) {
-
-        if (count === 0) {
-            points.push(a, b, c);
-            points.push(a, c, d);
-        } else {
-
-            // var center = mix(a, c, 0.5);
-
-            // var a1 = mix( c, a, 1/3);
-            // var b1 = mix( d, b, 1/3);
-            // var c1 = mix( a, c, 1/3);
-            // var d1 = mix( b, d, 1/3);
-
-            // var ab = mix( a, b, 0.5 );
-            // var bc = mix( b, c, 0.5 );
-            // var cd = mix( c, d, 0.5 );
-            // var ad = mix( a, d, 0.5 );
-
-            var ab = mix( a, b, 0.5 );
-            var bc = mix( b, c, 0.5 );
-            var cd = mix( c, d, 0.5 );
-            var da = mix( d, a, 0.5 );
-            var md = mix( ab, cd, 0.5 );
-
-            --count;
-            
-            divideSquare( a, ab, md, da, 0, count);
-            divideSquare( ab, b, bc, md, 1, count);
-            divideSquare( da, md, cd, d, 2, count);
-            divideSquare( md, bc, c, cd, 3, count);
-
-            if (gasket) {
-                divideSquare(a1, b1, c1, d1, count, gasket);
-            }
-        }
-    }
-
-    function getVerticesBy(shape) {
-
-        if (shape == "square") {
-            return [
+            vertices: [
                 vec2(-0.5, 0.5),    // top left
                 vec2(0.5, 0.5),     // top right
-                vec2(0.5, -0.5),    // bottom right 
+                vec2(0.5, -0.5),    // bottom right
                 vec2(-0.5, -0.5)    // bottom left
-            ];
-        } else {
-            return [
-                vec2( -Math.cos(ang2rad(30)), -0.5 ),   // bottom left
-                vec2( 0,  1 ),                          // top middle
-                vec2( Math.cos(ang2rad(30)), -0.5 )     // bottom right
-            ];
+            ],
+
+            adjustRange: function(tessalation) {
+                rangeTessalation.setAttribute("max", "4");
+                if (tessalation > 4) {
+                    return 4;
+                }
+                return tessalation;
+            }
+
+        },
+
+        triangle: {
+
+            divide: function (vertices, count, gasket) {
+
+                var a = vertices[0];
+                var b = vertices[1];
+                var c = vertices[2];
+
+                //this function is called recursively, hence check needed
+
+                if (count === 0) {
+                    points.push(a, b, c);
+                } else {
+
+                    //bisect the sides
+
+                    var ab = mix(a, b, 0.5);
+                    var ac = mix(a, c, 0.5);
+                    var bc = mix(b, c, 0.5);
+
+                    --count;
+
+                    // divide three new triangles
+                    this.divide([a, ab, ac], count, gasket);
+                    this.divide([c, ac, bc], count, gasket);
+                    this.divide([b, bc, ab], count, gasket);
+
+                    if (!gasket) {
+                        this.divide([ac, ab, bc], count, gasket);
+                    }
+                }
+            },
+
+            vertices: [
+                vec2(-Math.cos(ang2rad(30)), -0.5),   // bottom left
+                vec2(0, 1),                          // top middle
+                vec2(Math.cos(ang2rad(30)), -0.5)     // bottom right
+            ],
+
+            adjustRange: function(tessalation) {
+                rangeTessalation.setAttribute("max", "7");
+                if (tessalation > 7) {
+                    return 7;
+                }
+                return tessalation;
+            }
         }
-    }
+    };
 
     function update() {
 
-        points = [];
+        points = []; // reset points
 
         var tessalation = Number(rangeTessalation.value);
         var twist = Number(rangeTwist.value);
-        var gasket = !checkboxGasket.checked;
         var shape = "triangle";
+        var fill = "gasket";
 
         for (var s = 0; s < radiosShape.length; s++) {
             if (radiosShape[s].checked) {
@@ -121,13 +142,21 @@ window.onload = function init() {
             }
         }
 
-        var vertices = getVerticesBy(shape);
-
-        if (shape == "triangle") {
-            divideTriangle(vertices[0], vertices[1], vertices[2], tessalation, gasket);    
-        } else {
-            divideSquare(vertices[0], vertices[1], vertices[2], vertices[3], tessalation, gasket);
+        for (var f = 0; f < radiosFill.length; f++) {
+            if (radiosFill[f].checked) {
+                fill = radiosFill[f].value;
+                break;
+            }
         }
+
+        var gasket = fill === "gasket";
+
+        var objShape = shapeSetup[shape];
+        var vertices = objShape.vertices;
+
+        tessalation = objShape.adjustRange(tessalation);
+        rangeTessalation.setAttribute("value", tessalation);
+        objShape.divide(vertices, tessalation, gasket);
 
         if (twist > 0) {
 
@@ -160,9 +189,14 @@ window.onload = function init() {
         gl.enableVertexAttribArray( vPosition );
 
         // clear & render
-
         gl.clear( gl.COLOR_BUFFER_BIT );
-        gl.drawArrays( gl.TRIANGLES, 0, points.length );        
+        if (fill === "mesh") {
+            for (var i = 0; i < points.length; i += 3) {
+                gl.drawArrays( gl.LINE_LOOP, i, 3 );
+            }
+        } else {
+            gl.drawArrays( gl.TRIANGLES, 0, points.length );
+        }
     }
 
     // assign handlers for HTML components
@@ -177,21 +211,41 @@ window.onload = function init() {
         update();
     });
 
-    checkboxGasket.addEventListener("click", update);
-
     for (var s = 0; s < radiosShape.length; s++) {
-        radiosShape[s].addEventListener("click", update);    
+        radiosShape[s].addEventListener("click", function() {
+
+
+            var event; // The custom event that will be created
+
+            if (document.createEvent) {
+                event = document.createEvent("HTMLEvents");
+                event.eventName = "change";
+                event.initEvent("change", true, true);
+                rangeTessalation.dispatchEvent(event);
+            } else {
+                event = document.createEventObject();
+                event.eventName = "change";
+                event.eventType = "change";
+                rangeTessalation.fireEvent("on" + event.eventType, event);
+            }
+
+            update();
+        });
+    }
+
+    for (var f = 0; f < radiosFill.length; f++) {
+        radiosFill[f].addEventListener("click", update);
     }
 
     //  Configure WebGL
     
-    gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(1.0, 1.0, 1.0, 1.0);
 
     //  Load shaders and initialize attribute buffers
 
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
-    gl.useProgram( program );
+    gl.useProgram(program);
 
     // call render for the first time 
     
