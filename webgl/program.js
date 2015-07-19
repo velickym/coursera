@@ -199,38 +199,28 @@ window.onload = function init() {
         }
     }
 
-    // assign handlers for HTML components
+    // assign handlers for HTML components, doing "change" because of IE, "input" would be enough
 
+    rangeTessalation.addEventListener("change", function() {
+        labelTessalation.innerHTML = rangeTessalation.value;
+        update();
+    });
     rangeTessalation.addEventListener("input", function() {
         labelTessalation.innerHTML = rangeTessalation.value;
         update();
     });
 
+    rangeTwist.addEventListener("change", function() {
+        labelTwist.innerHTML = rangeTwist.value;
+        update();
+    });
     rangeTwist.addEventListener("input", function() {
         labelTwist.innerHTML = rangeTwist.value;
         update();
     });
 
     for (var s = 0; s < radiosShape.length; s++) {
-        radiosShape[s].addEventListener("click", function() {
-
-
-            var event; // The custom event that will be created
-
-            if (document.createEvent) {
-                event = document.createEvent("HTMLEvents");
-                event.eventName = "change";
-                event.initEvent("change", true, true);
-                rangeTessalation.dispatchEvent(event);
-            } else {
-                event = document.createEventObject();
-                event.eventName = "change";
-                event.eventType = "change";
-                rangeTessalation.fireEvent("on" + event.eventType, event);
-            }
-
-            update();
-        });
+        radiosShape[s].addEventListener("click", update);
     }
 
     for (var f = 0; f < radiosFill.length; f++) {
