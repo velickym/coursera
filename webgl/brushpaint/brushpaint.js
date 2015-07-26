@@ -25,7 +25,6 @@ var App = function() {
             colors.push(color.r, color.g, color.b);
         }
 
-        console.log(colors);
         var colorOffset = sizeof.vec3 * VERTICES_PER_SHAPE * drawnCount;
         gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, colorOffset, flatten(colors));
