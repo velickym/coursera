@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Brush paint</title>
+
+    <style>
+
+        canvas {
+            border: 1px dashed black;
+            margin-top: 1em;
+        }
+
+    </style>
+
+    <script id="vertex-shader" type="x-shader/x-vertex">
+
+        // application attributes
+        attribute vec4 vPosition;
+        attribute vec4 vColor;
+
+        varying vec4 fColor; // for rasterizer
+
+        void main() {
+            gl_Position = vPosition;
+            fColor = vColor;
+        }
+
+	</script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+
+        precision mediump float;
+
+        varying vec4 fColor;
+
+        void main() {
+            gl_FragColor = fColor;
+        }
+
+	</script>
+
+    <script type="text/javascript" src="common/webgl-utils.js"></script>
+    <script type="text/javascript" src="common/initShaders.js"></script>
+    <script type="text/javascript" src="common/MV.js"></script>
+    <script type="text/javascript" src="brushpaint.js"></script>
+
+</head>
+<body>
+
+    Line width
+    <input id="line-width" type="range" min="1" max="10" step="1" value="3" />
+
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+    Color
+    <input type="color" id="color" value="#00FF00" />
+
+    <br/>
+
+    <canvas id="gl-canvas" width="512" height="512">
+        Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
+
+</body>
+</html>
