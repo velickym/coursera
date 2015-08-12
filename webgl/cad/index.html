@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Cad (assignment 3)</title>
+
+    <script id="vertex-shader" type="x-shader/x-vertex">
+
+        attribute vec4 vPosition;
+        attribute vec4 vColor;
+        varying vec4 fColor;
+
+        uniform mat4 mvMatrix;
+        uniform mat4 pMatrix;
+
+        void main() {
+            gl_Position = pMatrix * mvMatrix * vPosition;
+            fColor = vColor;
+        }
+
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+
+        precision mediump float;
+        varying vec4 fColor;
+
+        void main() {
+            gl_FragColor = fColor;
+        }
+
+    </script>
+
+    <link rel="stylesheet" href="style.css" />
+
+    <script type="text/javascript" src="../common/webgl-utils.js"></script>
+    <script type="text/javascript" src="../common/initShaders.js"></script>
+    <script type="text/javascript" src="../common/MV.js"></script>
+    <script type="text/javascript" src="shape.js"></script>
+    <script type="text/javascript" src="cad.js"></script>
+    <script type="text/javascript" src="ui.js"></script>
+
+    <script type="text/javascript">
+
+        window.onload = function() {
+            Cad.init(Shape);
+            UI.init(Cad);
+        };
+
+    </script>
+
+</head>
+
+<body>
+
+    <section id="sidebar">
+
+        New
+        <select id="shape">
+            <option value="sphere">Sphere</option>
+            <option value="cylinder">Cylinder</option>
+            <option value="cone">Cone</option>
+        </select>
+        <button type="button" id="add">
+            Add
+        </button>
+
+        <div id="transformations">
+
+            <div class="transformation">
+                <span>Transition X</span>
+                <input id="transition-x" type="range" min="-10" max="10" step="1" value="0" />
+                <label id="label-transition-x">0</label>
+            </div>
+
+            <div class="transformation">
+                <span>Transition Y</span>
+                <input id="transition-y" type="range" min="-10" max="10" step="1" value="0" />
+                <label id="label-transition-y">0</label>
+            </div>
+
+            <div class="transformation">
+                <span>Transition Z</span>
+                <input id="transition-z" type="range" min="-10" max="10" step="1" value="0" />
+                <label id="label-transition-z">0</label>
+            </div>
+
+            <div class="transformation">
+                <span>Rotation X</span>
+                <input id="rotation-x" type="range" min="0" max="360" step="10" value="0" />
+                <label id="label-rotation-x">0</label>
+            </div>
+
+            <div class="transformation">
+                <span>Rotation Y</span>
+                <input id="rotation-y" type="range" min="0" max="360" step="10" value="0" />
+                <label id="label-rotation-y">0</label>
+            </div>
+
+            <div class="transformation">
+                <span>Rotation Z</span>
+                <input id="rotation-z" type="range" min="0" max="360" step="10" value="0" />
+                <label id="label-rotation-z">0</label>
+            </div>
+
+            <div class="transformation">
+                <span>Size</span>
+                <input id="size" type="range" min="0.1" max="3" step="0.1" value="1" />
+                <label id="label-size">1</label>
+            </div>
+
+            <br/>
+
+            <button id="place">Place</button>
+            <button id="cancel">Cancel</button>
+
+        </div>
+
+    </section>
+
+    <section id="scene">
+
+        <div id="objects"></div>
+
+        <canvas id="gl-canvas" width="800" height="600">
+            Oops ... your browser doesn't support the HTML5 canvas element
+        </canvas>
+    </section>
+
+</body>
+</html>
