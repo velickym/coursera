@@ -1,0 +1,48 @@
+body {
+    margin: 1em;
+}
+
+button {
+    cursor: pointer;
+}
+
+section {
+    display: inline-block;
+    vertical-align: top;
+}
+
+canvas {
+    border: 1px dashed grey;
+}
+
+#objects {
+    min-height: 2em;
+}
+
+#objects button {
+    margin-right: 1em;
+}
+
+img.remove {
+    width: 12px;
+    height: 12px;
+    vertical-align: middle;
+    margin-right: 3px;
+    margin-bottom: 2px;
+}
+
+#sidebar {
+    width: 11em;
+}
+
+#transformations {
+    display: none;
+}
+
+.transformation {
+    margin-top: 1em;
+}
+
+.transformation span {
+    display: block;
+}
