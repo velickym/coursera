@@ -5,15 +5,21 @@ window.Shape = function() {
         green: vec4(0.0, 1.0, 0.0, 1.0)
     };
 
-    function triangle(a, b, c, color, vertices, colors) {
+    function triangle(a, b, c, color, arrays) {
 
-        vertices.push(a);
-        vertices.push(b);
-        vertices.push(c);
+        arrays.vertices.push(a);
+        arrays.vertices.push(b);
+        arrays.vertices.push(c);
 
-        colors.push(color);
-        colors.push(color);
-        colors.push(color);
+        arrays.colors.push(color);
+        arrays.colors.push(color);
+        arrays.colors.push(color);
+
+        var t1 = subtract(b, a);
+        var t2 = subtract(c, b);
+        var normal = vec3(cross(t1, t2));
+
+        arrays.normals.push(normal);
     }
 
     return {
@@ -25,8 +31,11 @@ window.Shape = function() {
             var radius = 1;
 
             var grid = [];
-            var vertices = [];
-            var colors = [];
+            var arrays = {
+                vertices: [],
+                colors: [],
+                normals: []
+            };
 
             for (var lat = 0; lat <= latitudeBands; lat++) {
 
@@ -56,8 +65,8 @@ window.Shape = function() {
                         var previousLongVertex = row[long - 1];
                         var diagonalVertex = grid[lat - 1][long - 1];
 
-                        triangle(diagonalVertex, previousLongVertex, previousLatVertex, color, vertices, colors);
-                        triangle(previousLongVertex, currentVertex, previousLatVertex, color, vertices, colors);
+                        triangle(diagonalVertex, previousLongVertex, previousLatVertex, color, arrays);
+                        triangle(previousLongVertex, currentVertex, previousLatVertex, color, arrays);
                     }
 
                     row[long] = currentVertex;
@@ -69,8 +78,7 @@ window.Shape = function() {
             return {
                 name: "Sphere",
                 matrix: mat4(),
-                colors: colors,
-                vertices: vertices
+                arrays: arrays
             }
         },
 
@@ -84,9 +92,12 @@ window.Shape = function() {
             var vertexBottom = vec4(0, bottom, 0, 1.0);
             var vertexTop = vec4(0, top, 0, 1.0);
 
-            var vertices = [];
-            var colors = [];
             var previousVertex = null;
+            var arrays = {
+                vertices: [],
+                colors: [],
+                normals: []
+            };
 
             for (var i = 0; i <= bands; i++) {
 
@@ -100,8 +111,8 @@ window.Shape = function() {
                 var color = i % 2 == 0 ? COLOR.green : COLOR.blue;
 
                 if (previousVertex != null) {
-                    triangle(vertexBottom, previousVertex, vertex, color, vertices, colors);
-                    triangle(vertexTop, vertex, previousVertex, color, vertices, colors);
+                    triangle(vertexBottom, previousVertex, vertex, color, arrays);
+                    triangle(vertexTop, vertex, previousVertex, color, arrays);
                 }
 
                 previousVertex = vertex;
@@ -110,8 +121,7 @@ window.Shape = function() {
             return {
                 name: "Cone",
                 matrix: mat4(),
-                colors: colors,
-                vertices: vertices
+                arrays: arrays
             }
         },
 
@@ -125,10 +135,14 @@ window.Shape = function() {
             var vertexCenterBottom = vec4(0, bottom, 0, 1.0);
             var vertexCenterTop = vec4(0, top, 0, 1.0);
 
-            var vertices = [];
-            var colors = [];
             var previousVertexTop = null;
             var previousVertexBottom = null;
+
+            var arrays = {
+                vertices: [],
+                colors: [],
+                normals: []
+            };
 
             for (var i = 0; i <= bands; i++) {
 
@@ -143,10 +157,10 @@ window.Shape = function() {
                 var color = i % 2 == 0 ? COLOR.green : COLOR.blue;
 
                 if (previousVertexTop != null && previousVertexBottom != null) {
-                    triangle(vertexCenterTop, vertexTop, previousVertexTop, color, vertices, colors);
-                    triangle(vertexCenterBottom, vertexBottom, previousVertexBottom, color, vertices, colors);
-                    triangle(vertexBottom, previousVertexBottom, previousVertexTop, color, vertices, colors);
-                    triangle(previousVertexTop, vertexTop, vertexBottom, color, vertices, colors);
+                    triangle(vertexCenterTop, vertexTop, previousVertexTop, color, arrays);
+                    triangle(vertexCenterBottom, vertexBottom, previousVertexBottom, color, arrays);
+                    triangle(vertexBottom, previousVertexBottom, previousVertexTop, color, arrays);
+                    triangle(previousVertexTop, vertexTop, vertexBottom, color, arrays);
                 }
 
                 previousVertexTop = vertexTop;
@@ -156,8 +170,7 @@ window.Shape = function() {
             return {
                 name: "Cylinder",
                 matrix: mat4(),
-                colors: colors,
-                vertices: vertices
+                arrays: arrays
             }
         }
     }

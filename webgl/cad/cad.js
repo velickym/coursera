@@ -21,6 +21,21 @@ window.Cad = function() {
         projectionMatrix,
         projectionMatrixLoc;
 
+
+    var lightPosition = vec4(1.0, 1.0, 1.0, 0.0);
+    var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
+    var lightDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
+    var lightSpecular = vec4(1.0, 1.0, 1.0, 1.0);
+
+    var materialAmbient = vec4(1.0, 0.0, 1.0, 1.0);
+    var materialDiffuse = vec4(1.0, 0.8, 0.0, 1.0);
+    var materialSpecular = vec4(1.0, 0.8, 0.0, 1.0);
+    var materialShininess = 100.0;
+
+    var ambientColor, diffuseColor, specularColor;
+
+
+
     var objects = [];
     var uncommittedObject = null;
 
@@ -48,6 +63,25 @@ window.Cad = function() {
 
         modelViewMatrix = mult(modelViewMatrix, object.matrix);
         gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+
+
+        var ambientProduct = mult(lightAmbient, materialAmbient);
+        var diffuseProduct = mult(lightDiffuse, materialDiffuse);
+        var specularProduct = mult(lightSpecular, materialSpecular);
+
+
+        gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"),
+            flatten(ambientProduct));
+        gl.uniform4fv(gl.getUniformLocation(program, "diffuseProduct"),
+            flatten(diffuseProduct) );
+        gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"),
+            flatten(specularProduct) );
+        gl.uniform4fv(gl.getUniformLocation(program, "lightPosition"),
+            flatten(lightPosition) );
+
+        gl.uniform1f(gl.getUniformLocation(program,
+            "shininess"), materialShininess);
+
 
         gl.drawArrays(gl.TRIANGLES, 0, object.vertices.length);
     }

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Texture on a sphere (assignment 5)</title>
+
+    <script id="vertex-shader" type="x-shader/x-vertex">
+
+        attribute vec4 vPosition;
+        attribute vec2 aTextureCoord;
+
+        uniform mat4 mvMatrix;
+        uniform mat4 pMatrix;
+        uniform mat4 nMatrix;
+        uniform vec3 theta;
+
+        varying vec2 textureCoord;
+
+        void main() {
+
+            vec3 angles = radians(theta);
+            vec3 c = cos(angles);
+            vec3 s = sin(angles);
+
+            // rotation matrices
+            mat4 rx = mat4( 1.0,  0.0,  0.0, 0.0,
+                            0.0,  c.x,  s.x, 0.0,
+                            0.0, -s.x,  c.x, 0.0,
+                            0.0,  0.0,  0.0, 1.0 );
+
+            mat4 ry = mat4( c.y, 0.0, -s.y, 0.0,
+                            0.0, 1.0,  0.0, 0.0,
+                            s.y, 0.0,  c.y, 0.0,
+                            0.0, 0.0,  0.0, 1.0 );
+
+            mat4 rz = mat4( c.z, -s.z, 0.0, 0.0,
+                            s.z,  c.z, 0.0, 0.0,
+                            0.0,  0.0, 1.0, 0.0,
+                            0.0,  0.0, 0.0, 1.0 );
+
+            vec4 position = rx * ry * rz * vPosition;
+
+            gl_Position = pMatrix * mvMatrix * position;
+
+            textureCoord = aTextureCoord;
+        }
+
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+
+        precision mediump float;
+
+        varying vec2 textureCoord;
+
+        uniform sampler2D texture;
+
+        void main() {
+            gl_FragColor = texture2D(texture, textureCoord);
+        }
+
+    </script>
+
+    <style>
+
+        * {
+            font-family: Verdana, Arial;
+            font-size: 10pt;
+        }
+        
+        html, body {
+            margin: 0 auto;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        #controls {
+            position: fixed;
+            left: 2%;
+            top: 3%;
+            color: white;
+        }
+
+        fieldset {
+            margin-bottom: 1.4em;
+            padding: 1.2em;
+        }
+
+        fieldset input {
+            margin: 0.8em 0.4em 0.4em 0.8em;
+            padding-down: 0.8em;
+        }
+
+        label {
+            display: inline-block;
+            width: 30px;
+        }
+
+    </style>
+
+
+    <script type="text/javascript" src="../common/webgl-utils.js"></script>
+    <script type="text/javascript" src="../common/initShaders.js"></script>
+    <script type="text/javascript" src="../common/MV.js"></script>
+    <script type="text/javascript" src="sphere.js"></script>
+    <script type="text/javascript" src="program.js"></script>
+    <script type="text/javascript" src="ui.js"></script>
+
+    <script type="text/javascript">
+
+        window.onload = function() {
+
+            var canvas = document.getElementById("gl-canvas");
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            TextureProgram.init(Sphere);
+            Ui.init(TextureProgram);
+        };
+
+    </script>
+
+</head>
+
+<body>
+
+    <canvas id="gl-canvas">
+        Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
+
+    <div id="controls">
+
+        <fieldset id="texture">
+
+            <legend>Texture</legend>
+
+            <input id="texture-earth" type="radio" name="texture" value="earth" checked="checked" />Earth
+            <input id="texture-checkerboard" type="radio" name="texture" value="checkerboard" />Checkerboard
+
+        </fieldset>
+
+        <fieldset id="rotation">
+            <legend>Rotation</legend>
+            x<input id="x" type="range" min="0" max="360" step="5" value="0" />
+            <label id="x-label">0</label>
+            <br/>
+            y<input id="y" type="range" min="0" max="360" step="5" value="0" />
+            <label id="y-label">0</label>
+            <br/>
+            z<input id="z" type="range" min="0" max="360" step="5" value="0" />
+            <label id="z-label">0</label>
+        </fieldset>
+
+    </div>
+
+</body>
+</html>
